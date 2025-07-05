@@ -21,11 +21,13 @@ jobs:
           ssh-keyscan -H 46.202.141.5 >> ~/.ssh/known_hosts
 
       - name: 🚀 Deploy via SSH
-        run: |
-          ssh -i ~/.ssh/id_ed25519 root@46.202.141.5 << 'EOF'
+        uses: appleboy/ssh-action@master
+        with:
+          host: 46.202.141.5
+          username: root
+          key: ${{ secrets.VPS_KEY }}
+          port: 22
+          script: |
             cd /var/www/erp-backend
             git pull origin main
-            npm install
-            pm2 restart erp-backend || pm2 start app.js --name erp-backend
-            pm2 save
-          EOF
+            pm2 restart erp-backend
