@@ -13,11 +13,15 @@ connectDB(); // 👈 MongoDB connection
 app.use(cors());
 app.use(bodyParser.json());
 
+// Root route
 app.get('/', (req, res) => {
   res.send('ERP Backend is Api!');
 });
 
+// Auth route (open)
 app.use('/api/auth', authRoutes);
+
+// Employee route (protected)
 app.use('/api/employees', verifyToken, employeeRoutes);
 
 const PORT = 3001;

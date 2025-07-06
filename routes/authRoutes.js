@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
-const upload = require('../middleware/upload'); // 👈 Multer middleware
+const upload = require('../middleware/upload');
 
-// Signup with profile image upload
+// Signup with image upload
 router.post('/signup', upload.single('profile'), authController.signup);
 
-// Normal login route
+// Login route
 router.post('/login', authController.login);
 
 module.exports = router;
