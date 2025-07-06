@@ -1,17 +1,16 @@
-const express = require('express');
-const app = express();
-const connectDB = require('./config/db');
+// config/db.js
+const mongoose = require('mongoose');
 
-// Connect to MongoDB
-connectDB();
+const connectDB = async () => {
+  try {
+    await mongoose.connect('mongodb://localhost:27017/erp_db', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('✅ MongoDB connected');
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err.message);
+  }
+};
 
-app.use(express.json());
-
-// Example default route
-app.get('/', (req, res) => {
-  res.send('ERP MongoDB Backend is working!');
-});
-
-app.listen(3000, () => {
-  console.log('✅ Server running on http://localhost:3000');
-});
+module.exports = connectDB;
