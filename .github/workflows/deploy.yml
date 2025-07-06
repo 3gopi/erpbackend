@@ -1,4 +1,4 @@
-name: 🚀 Deploy to VPS
+name: Deploy ERP Backend
 
 on:
   push:
@@ -10,24 +10,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: 🔐 Setup SSH Key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H 46.202.141.5 >> ~/.ssh/known_hosts
+      - name: Upload backend to VPS
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_KEY }}
+          source: "."
+          target: "/var/www/erp-backend"
+          strip_components: 1
+          scp_ignore: ".scpignore"
 
-      - name: 🚀 Deploy via SSH
+      - name: Restart PM2 on VPS
         uses: appleboy/ssh-action@master
         with:
-          host: 46.202.141.5
-          username: root
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_KEY }}
-          port: 22
           script: |
             cd /var/www/erp-backend
-            git pull origin main
-            pm2 restart erp-backend
+            npm install
+            pm2 restart erp-backend || pm2 start app.js --name erp-backend
