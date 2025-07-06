@@ -1,9 +1,11 @@
-const db = require('../config/db');
+// models/userModel.js
+const mongoose = require('mongoose');
 
-exports.createUser = (data, cb) => {
-  db.query('INSERT INTO users (username, password) VALUES (?, ?)', [data.username, data.password], cb);
-};
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true }
+});
 
-exports.findUserByUsername = (username, cb) => {
-  db.query('SELECT * FROM users WHERE username = ?', [username], cb);
-};
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;

@@ -1,12 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const connectDB = require('./config/db');
 
 const authRoutes = require('./routes/authRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const verifyToken = require('./middleware/auth');
 
 const app = express();
+connectDB(); // 👈 MongoDB connection
+
 app.use(cors());
 app.use(bodyParser.json());
 
