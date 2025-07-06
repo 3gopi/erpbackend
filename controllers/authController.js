@@ -1,38 +1,73 @@
-// controllers/authController.js
-const bcrypt = require('bcryptjs');
+const User = require('../models/User');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel');
-const JWT_SECRET = 'your_secret_key';
 
+const SECRET_KEY = 'your_jwt_secret_key'; // 🔐 store securely in .env
+
+// ✅ Signup Controller
 exports.signup = async (req, res) => {
-  const { username, password } = req.body;
   try {
-    const existingUser = await User.findOne({ username });
-    if (existingUser) return res.status(409).json({ error: 'Username already exists' });
+    const { username, email, number, profile, password } = req.body;
 
-    const hash = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, password: hash });
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      return res.status(409).json({ error: 'Username or Email already exists' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      username,
+      email,
+      number,
+      profile,
+      password: hashedPassword
+    });
+
     await newUser.save();
-    res.json({ message: 'User created' });
+
+    // 🔑 Generate JWT
+    const token = jwt.sign({ userId: newUser._id }, SECRET_KEY, { expiresIn: '1d' });
+
+    res.status(201).json({
+      message: 'User created successfully',
+      token
+    });
+
   } catch (err) {
-    console.error(err);
+    console.error('Signup Error:', err.message);
     res.status(500).json({ error: 'Signup failed' });
   }
 };
 
+// ✅ Login Controller
 exports.login = async (req, res) => {
-  const { username, password } = req.body;
   try {
+    const { username, password } = req.body;
+
     const user = await User.findOne({ username });
-    if (!user) return res.status(401).json({ error: 'User not found' });
+    if (!user) return res.status(401).json({ error: 'Invalid username or password' });
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(401).json({ error: 'Wrong password' });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ error: 'Invalid username or password' });
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
-    res.json({ message: 'Login successful', token });
+    // 🔑 Generate JWT
+    const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1d' });
+
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        number: user.number,
+        profile: user.profile
+      }
+    });
+
   } catch (err) {
-    console.error(err);
+    console.error('Login Error:', err.message);
     res.status(500).json({ error: 'Login failed' });
   }
 };
