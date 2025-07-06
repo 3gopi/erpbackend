@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -34,3 +37,4 @@ jobs:
             cd /var/www/erp-backend
             npm install
             pm2 restart erp-backend || pm2 start app.js --name erp-backend
+

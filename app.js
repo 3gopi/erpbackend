@@ -11,7 +11,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
-  res.send('ERP Backend is working!');
+  res.send('ERP Backend is Api!');
 });
 
 app.use('/api/auth', authRoutes);
