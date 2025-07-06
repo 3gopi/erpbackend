@@ -2,12 +2,13 @@ const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const SECRET_KEY = 'your_jwt_secret_key'; // 🔐 store securely in .env
+const SECRET_KEY = 'your_jwt_secret_key'; // 🔐 Store in .env
 
-// ✅ Signup Controller
+// ✅ Signup Controller with image upload
 exports.signup = async (req, res) => {
   try {
-    const { username, email, number, profile, password } = req.body;
+    const { username, email, number, password } = req.body;
+    const profile = req.file ? `/uploads/${req.file.filename}` : null;
 
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
@@ -26,7 +27,6 @@ exports.signup = async (req, res) => {
 
     await newUser.save();
 
-    // 🔑 Generate JWT
     const token = jwt.sign({ userId: newUser._id }, SECRET_KEY, { expiresIn: '1d' });
 
     res.status(201).json({
@@ -37,37 +37,5 @@ exports.signup = async (req, res) => {
   } catch (err) {
     console.error('Signup Error:', err.message);
     res.status(500).json({ error: 'Signup failed' });
-  }
-};
-
-// ✅ Login Controller
-exports.login = async (req, res) => {
-  try {
-    const { username, password } = req.body;
-
-    const user = await User.findOne({ username });
-    if (!user) return res.status(401).json({ error: 'Invalid username or password' });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ error: 'Invalid username or password' });
-
-    // 🔑 Generate JWT
-    const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1d' });
-
-    res.status(200).json({
-      message: 'Login successful',
-      token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        number: user.number,
-        profile: user.profile
-      }
-    });
-
-  } catch (err) {
-    console.error('Login Error:', err.message);
-    res.status(500).json({ error: 'Login failed' });
   }
 };
