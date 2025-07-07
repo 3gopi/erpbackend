@@ -3,24 +3,43 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const SECRET_KEY = process.env.SECRET_KEY || 'fallback_secret';
 
-// SIGNUP
 exports.signup = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, email, number, password, profile } = req.body;
 
-    const userExists = await User.findOne({ username });
-    if (userExists) return res.status(400).json({ error: 'User already exists' });
+    // Validate required fields
+    if (!username || !email || !number || !password) {
+      return res.status(400).json({ error: 'All fields except profile are required' });
+    }
 
+    // Check if username or email already exists
+    const userExists = await User.findOne({ $or: [{ username }, { email }] });
+    if (userExists) {
+      return res.status(400).json({ error: 'Username or email already exists' });
+    }
+
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({ username, password: hashedPassword });
 
+    // Create new user
+    const newUser = await User.create({
+      username,
+      email,
+      number,
+      profile, // optional
+      password: hashedPassword
+    });
+
+    // Generate token
     const token = jwt.sign({ id: newUser._id }, SECRET_KEY, { expiresIn: '1d' });
 
     res.status(201).json({ message: 'Signup successful', token });
   } catch (err) {
+    console.error('Signup error:', err);
     res.status(500).json({ error: 'Signup failed' });
   }
 };
+
 
 // LOGIN
 exports.login = async (req, res) => {

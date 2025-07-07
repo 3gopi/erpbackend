@@ -1,24 +1,10 @@
-const db = require('../config/db');
+const mongoose = require('mongoose');
 
-exports.add = (data, userId, cb) => {
-  const { product_id, quantity, sale_date } = data;
-  db.query(
-    'INSERT INTO sales (product_id, quantity, sale_date, user_id) VALUES (?, ?, ?, ?)',
-    [product_id, quantity, sale_date, userId],
-    cb
-  );
-};
+const saleSchema = new mongoose.Schema({
+  product_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  quantity: { type: Number, required: true },
+  sale_date: { type: Date, default: Date.now },
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+});
 
-exports.report = (userId, cb) => {
-  const sql = `
-    SELECT 
-      p.name AS product,
-      SUM(s.quantity) AS total_sold,
-      SUM(s.quantity * p.price) AS total_revenue
-    FROM sales s
-    JOIN products p ON s.product_id = p.id
-    WHERE s.user_id = ?
-    GROUP BY s.product_id
-  `;
-  db.query(sql, [userId], cb);
-};
+module.exports = mongoose.model('Sale', saleSchema);
