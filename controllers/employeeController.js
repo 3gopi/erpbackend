@@ -1,29 +1,51 @@
 const Employee = require('../models/employeeModel');
 
-exports.getEmployees = (req, res) => {
-  Employee.getAll(req.userId, (err, results) => {
-    if (err) res.status(500).send(err);
-    else res.json(results);
-  });
+e// Get all employees for a user
+exports.getAll = async (req, res) => {
+  try {
+    const employees = await Employee.find({ user_id: req.userId });
+    res.json(employees);
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching employees' });
+  }
 };
 
-exports.addEmployee = (req, res) => {
-  Employee.create(req.body, req.userId, (err) => {
-    if (err) res.status(500).json({ error: 'Failed to add employee' });
-    else res.json({ message: 'Employee added' });
-  });
+// Create a new employee
+exports.create = async (req, res) => {
+  try {
+    const newEmp = new Employee({ ...req.body, user_id: req.userId });
+    await newEmp.save();
+    res.status(201).json({ message: 'Employee created', employee: newEmp });
+  } catch (err) {
+    res.status(500).json({ error: 'Error creating employee' });
+  }
 };
 
-exports.updateEmployee = (req, res) => {
-  Employee.update(req.params.id, req.body, req.userId, (err) => {
-    if (err) res.status(500).json({ error: 'Failed to update employee' });
-    else res.json({ message: 'Employee updated' });
-  });
+// Update employee
+exports.update = async (req, res) => {
+  try {
+    const updated = await Employee.findOneAndUpdate(
+      { _id: req.params.id, user_id: req.userId },
+      req.body,
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: 'Employee not found' });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: 'Error updating employee' });
+  }
 };
 
-exports.deleteEmployee = (req, res) => {
-  Employee.delete(req.params.id, req.userId, (err) => {
-    if (err) res.status(500).json({ error: 'Failed to delete employee' });
-    else res.json({ message: 'Employee deleted' });
-  });
+// Delete employee
+exports.delete = async (req, res) => {
+  try {
+    const deleted = await Employee.findOneAndDelete({
+      _id: req.params.id,
+      user_id: req.userId
+    });
+    if (!deleted) return res.status(404).json({ error: 'Employee not found' });
+    res.json({ message: 'Employee deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error deleting employee' });
+  }
 };

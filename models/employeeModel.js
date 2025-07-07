@@ -1,21 +1,11 @@
-const db = require('../config/db');
+const mongoose = require('mongoose');
 
-exports.getAll = (userId, cb) => {
-  db.query('SELECT * FROM employees WHERE user_id = ?', [userId], cb);
-};
+const employeeSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  position: { type: String, required: true },
+  department: { type: String },
+  salary: { type: Number, required: true },
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
 
-exports.create = (data, userId, cb) => {
-  const { name, position, department, salary } = data;
-  db.query('INSERT INTO employees (name, position, department, salary, user_id) VALUES (?, ?, ?, ?, ?)', 
-    [name, position, department, salary, userId], cb);
-};
-
-exports.update = (id, data, userId, cb) => {
-  const { name, position, department, salary } = data;
-  db.query('UPDATE employees SET name=?, position=?, department=?, salary=? WHERE id=? AND user_id=?',
-    [name, position, department, salary, id, userId], cb);
-};
-
-exports.delete = (id, userId, cb) => {
-  db.query('DELETE FROM employees WHERE id=? AND user_id=?', [id, userId], cb);
-};
+module.exports = mongoose.model('Employee', employeeSchema);
