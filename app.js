@@ -11,7 +11,9 @@ const app = express();
 connectDB(); // 👈 MongoDB connection
 
 app.use(cors());
+app.use('/uploads', express.static('uploads')); // ✅ Allow serving uploaded images
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); // ✅ Also add this for form-data
 
 // Root route
 app.get('/', (req, res) => {
