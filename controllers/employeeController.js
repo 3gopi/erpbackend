@@ -1,6 +1,6 @@
 const Employee = require('../models/employeeModel');
 
-e// Get all employees for a user
+// Get all employees for a user
 exports.getAll = async (req, res) => {
   try {
     const employees = await Employee.find({ user_id: req.userId });
