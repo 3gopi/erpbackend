@@ -6,6 +6,6 @@ const employeeSchema = new mongoose.Schema({
   department: { type: String },
   salary: { type: Number, required: true },
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-}, { timestamps: true });
+}, );
 
 module.exports = mongoose.model('Employee', employeeSchema);

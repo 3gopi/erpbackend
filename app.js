@@ -5,26 +5,28 @@ const connectDB = require('./config/db');
 
 const authRoutes = require('./routes/authRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
+const productRoutes = require('./routes/productRoutes');
+const salesRoutes = require('./routes/salesRoutes');
 const verifyToken = require('./middleware/auth');
 
 const app = express();
-connectDB(); // 👈 MongoDB connection
+connectDB();
 
 app.use(cors());
-app.use('/uploads', express.static('uploads')); // ✅ Allow serving uploaded images
+app.use('/uploads', express.static('uploads')); // Serve uploaded files
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true })); // ✅ Also add this for form-data
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// Root route
+// Root
 app.get('/', (req, res) => {
   res.send('ERP Backend is Api!');
 });
 
-// Auth route (open)
+// Routes
 app.use('/api/auth', authRoutes);
-
-// Employee route (protected)
 app.use('/api/employees', verifyToken, employeeRoutes);
+app.use('/api/products', verifyToken, productRoutes);
+app.use('/api/sales', verifyToken, salesRoutes);
 
 const PORT = 3001;
 app.listen(PORT, () => {

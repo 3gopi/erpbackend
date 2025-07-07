@@ -16,12 +16,12 @@ exports.create = (data, userId, cb) => {
 exports.update = (id, data, userId, cb) => {
   const { name, stock, price } = data;
   db.query(
-    'UPDATE products SET name=?, stock=?, price=? WHERE id=? AND user_id=?',
+    'UPDATE products SET name = ?, stock = ?, price = ? WHERE id = ? AND user_id = ?',
     [name, stock, price, id, userId],
     cb
   );
 };
 
 exports.delete = (id, userId, cb) => {
-  db.query('DELETE FROM products WHERE id=? AND user_id=?', [id, userId], cb);
+  db.query('DELETE FROM products WHERE id = ? AND user_id = ?', [id, userId], cb);
 };

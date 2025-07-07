@@ -1,7 +1,7 @@
 const Employee = require('../models/employeeModel');
 
-// Get all employees for a user
-exports.getAll = async (req, res) => {
+// 🔍 GET /api/employees
+exports.getEmployees = async (req, res) => {
   try {
     const employees = await Employee.find({ user_id: req.userId });
     res.json(employees);
@@ -10,8 +10,8 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// Create a new employee
-exports.create = async (req, res) => {
+// ➕ POST /api/employees
+exports.createEmployee = async (req, res) => {
   try {
     const newEmp = new Employee({ ...req.body, user_id: req.userId });
     await newEmp.save();
@@ -21,8 +21,8 @@ exports.create = async (req, res) => {
   }
 };
 
-// Update employee
-exports.update = async (req, res) => {
+// ✏️ PUT /api/employees/:id
+exports.updateEmployee = async (req, res) => {
   try {
     const updated = await Employee.findOneAndUpdate(
       { _id: req.params.id, user_id: req.userId },
@@ -36,8 +36,8 @@ exports.update = async (req, res) => {
   }
 };
 
-// Delete employee
-exports.delete = async (req, res) => {
+// ❌ DELETE /api/employees/:id
+exports.deleteEmployee = async (req, res) => {
   try {
     const deleted = await Employee.findOneAndDelete({
       _id: req.params.id,

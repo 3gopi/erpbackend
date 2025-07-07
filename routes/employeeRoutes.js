@@ -3,11 +3,16 @@ const router = express.Router();
 const employeeController = require('../controllers/employeeController');
 const verifyToken = require('../middleware/auth');
 
-router.use(verifyToken);
+// GET all employees
+router.get('/', verifyToken, employeeController.getEmployees);
 
-router.get('/', employeeController.getAll);
-router.post('/', employeeController.create);
-router.put('/:id', employeeController.update);
-router.delete('/:id', employeeController.delete);
+// POST create employee
+router.post('/', verifyToken, employeeController.createEmployee);
+
+// PUT update employee
+router.put('/:id', verifyToken, employeeController.updateEmployee);
+
+// DELETE employee
+router.delete('/:id', verifyToken, employeeController.deleteEmployee);
 
 module.exports = router;
