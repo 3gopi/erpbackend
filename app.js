@@ -8,22 +8,24 @@ const employeeRoutes = require('./routes/employeeRoutes');
 const verifyToken = require('./middleware/auth');
 
 const app = express();
-connectDB(); // 👈 MongoDB connection
+connectDB(); // MongoDB connection
 
 app.use(cors());
 app.use(bodyParser.json());
 
-// Root route
+// ✅ Serve profile uploads statically
+app.use('/uploads', express.static('uploads'));
+
+// ✅ Root check
 app.get('/', (req, res) => {
   res.send('ERP Backend is Api!');
 });
 
-// Auth route (open)
-app.use('/api/auth', authRoutes);
+// ✅ Corrected routes
+app.use('/api/erp/auth', authRoutes);
+app.use('/api/erp/employees', verifyToken, employeeRoutes);
 
-// Employee route (protected)
-app.use('/api/employees', verifyToken, employeeRoutes);
-
+// ✅ Server
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
