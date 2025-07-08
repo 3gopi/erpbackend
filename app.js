@@ -21,10 +21,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Root
-app.get('/', (req, res) => {
-  res.send('ERP Backend is Api!');
+// Respond to /api/erp/
+app.get('/api/erp/', (req, res) => {
+  res.send('✅ ERP API is running!');
 });
-
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/employees', verifyToken, employeeRoutes);
