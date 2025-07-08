@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const salesController = require('../controllers/salesController');
 const verifyToken = require('../middleware/auth');
-sdgfgrssx
+
 // CRUD routes for sales
 router.get('/', verifyToken, salesController.getSales);         // Get all sales
 router.post('/', verifyToken, salesController.addSale);         // Add a sale
