@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
+// You can replace body-parser with express built-in parsers
+// const bodyParser = require('body-parser');
 const connectDB = require('./config/db');
 
 const authRoutes = require('./routes/authRoutes');
@@ -14,8 +15,10 @@ connectDB();
 
 app.use(cors());
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
+// Built-in body parsers
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Root
 app.get('/', (req, res) => {
@@ -28,7 +31,7 @@ app.use('/api/employees', verifyToken, employeeRoutes);
 app.use('/api/products', verifyToken, productRoutes);
 app.use('/api/sales', verifyToken, salesRoutes);
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
 });
