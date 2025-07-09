@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Root
 // Respond to /api/erp/
-app.get('/api/erp/', (req, res) => {
+app.get('/', (req, res) => {
   res.send('✅ ERP API is running!');
 });
 // Routes
